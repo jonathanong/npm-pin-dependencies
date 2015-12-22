@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+'use strict'
+
+const exec = require('child_process').execSync
+const semver = require('semver')
+const path = require('path')
+
+const pkg = require(path.resolve('package.json'))
+
+const option_map = {
+  'dependencies': '--save',
+  'devDependencies': '--save-dev',
+  'optionalDependencies': '--save-optional',
+}
+
+for (const key of Object.keys(option_map)) {
+  const option = option_map[key]
+  const dependencies = []
+  for (const name of Object.keys(pkg[key] || {})) {
+    const version = pkg[key][name]
+    // must be a valid range
+    if (!semver.validRange(version)) continue
+    // skip pinned dependencies
+    if (semver.valid(version)) continue
+    dependencies.push(`${name}@"${version}"`)
+  }
+  if (!dependencies.length) continue
+  const command = `npm install ${option} ${dependencies.join(' ')}`
+  console.log(command)
+  exec(command)
+}
