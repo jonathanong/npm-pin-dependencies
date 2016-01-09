@@ -25,7 +25,7 @@ for (const key of Object.keys(option_map)) {
     dependencies.push(`${name}@"${version}"`)
   }
   if (!dependencies.length) continue
-  const command = `npm install ${option} ${dependencies.join(' ')}`
+  const command = `npm install ${option} --save-exact ${dependencies.join(' ')}`
   console.log(command)
   exec(command)
 }
